@@ -1,22 +1,30 @@
 package com.tistory.jeongpro.springinit;
 
-import com.tistory.jeongpro.springinit.controller.MyController;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class SpringinitApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(SpringinitApplication.class, args);
+		//ConfigurableApplicationContext : ApplicationContext를 코드에 의해서 재구성할 수 있도록 기능을 집어넣은 ApplicationContext.
+		ConfigurableApplicationContext ac = SpringApplication.run(SpringinitApplication.class, args);
+		ac.addApplicationListener((ApplicationListener<MyEvent>)event-> System.out.println("Hello ApplicationListener : " + event.getMessage()));
+		ac.publishEvent(new MyEvent(ac,"My Spring Event"));
 	}
+	static class MyEvent extends ApplicationEvent {
+		private final String message;
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void init(){
-		System.out.println("Hello EventListener!! ApplicationReadyEvent");
+		//원래 String message는 없는 건데 추가한 것임.
+		public MyEvent(Object source, String message) {
+			super(source);
+			this.message = message;
+		}
+		public String getMessage(){
+			return message;
+		}
 	}
 }
 
